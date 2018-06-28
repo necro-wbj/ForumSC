@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh_Hant">
+<head>
+	<meta charset="utf-8">
+	<title>massage</title>
+	<script type="text/javascript">
+	function edit_click(ev){
+		var id=ev.target.getAttribute("t_id");
+		var xhr=new XMLHttpRequest();
+		xhr.open("GET","get.php?id="+id);
+		xhr.onreadystatechange = function(){//現在也可以用xhr.onload
+			if(this.readyState==4 ){
+				if(this.status == 200){
+					console.log(this.responseText);
+					var data= JSON.parse(this.responseText);
+					document.getElementById("prod").value=data.prod;
+					document.getElementById("price").value=data.price;
+					document.getElementById("ppid").value=data.id;
+					showNode("edit_form");
+					showNode("update_btn");
+					hideNode("add_btn");
+
+				}else{
+					console.log(this.responseText);
+					alert('修改失敗');
+				}
+			}
+		};
+		xhr.send();
+	}
+	function del_click(ev){
+		var data={id:ev.target.getAttribute("t_id")};
+		var xhr=new XMLHttpRequest();
+		xhr.open("DELETE","del.php");
+		xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
+		xhr.onreadystatechange = function(){//現在也可以用xhr.onload
+			if(this.readyState==4 ){
+				if(this.status == 200){
+					// console.log(this.responseText);
+					var ret= JSON.parse(this.responseText);
+					var tr = document.querySelector('tr[t_id="'+ret.id+'"]');
+					tr.parentNode.removeChild(tr);
+					}else{
+					console.log(this.responseText);
+					alert('刪除失敗');
+				}
+			}
+		};
+		xhr.send(JSON.stringify(data));
+	}
+	function insert2list(data,position=true){
+		var tb1 =document.getElementById('list');
+		if (position){
+			var row =tb1.insertRow(tb1.rows.length);
+		}else{
+			var row =tb1.insertRow(0);
+		}
+		row.setAttribute('t_id',data.gid);
+		var ce1,ce2,ce3
+		ce1=row.insertCell(0);
+		ce2=row.insertCell(1);
+		ce2=row.insertCell(2);
+		ce1.appendChild(document.createTextNode(data.name));
+		ce2.appendChild(document.createTextNode(data.msg));
+		var btn1,btn2
+		btn1=document.createElement('button');
+		btn1.setAttribute('t_id',data.gid);
+		btn1.appendChild(document.createTextNode('刪除'));
+		btn1.addEventListener('click',del_click);
+		btn2=document.createElement('button');
+		btn2.setAttribute('t_id',data.gid);
+		btn2.appendChild(document.createTextNode('修改'));
+		btn2.addEventListener('click',edit_click);
+		ce2.appendChild(btn1);
+		ce2.appendChild(btn2);
+	}
+	function getlist(){
+		var strUrl = location.search;
+		if (strUrl.indexOf("?") != -1) {
+			var aryPara = [];
+			var getSearch = strUrl.split("?");
+			getPara = getSearch[1].split("&");
+			for (i = 0; i < getPara.length; i++) {
+		    var ParaVal = getPara[i].split("=");
+		    aryPara.push(ParaVal[0]);
+		    aryPara[ParaVal[0]] = ParaVal[1];
+		  }
+			var data ={gid:aryPara["gid"],tid:aryPara["tid"]};
+		}
+		var xhr=new XMLHttpRequest();
+		xhr.open("POST","get_message_list.php");
+		xhr.onreadystatechange = function(){
+			if(this.readyState==4 ){
+				if(this.status == 200){
+					// console.log(this.responseText);
+					var all = JSON.parse(this.responseText);
+					for(var i=all.length-1;i>=0;i--){
+						insert2list(all[i],false);
+					// for(var i=0;i<all.length;i++){
+					// 	insert2list(all[i]);
+					// }
+					//順序會顛倒，但較快
+					}
+				}else{
+					console.log(this.responseText);
+				}
+			}
+		}
+		xhr.send(JSON.stringify(data));
+	}
+	function add2sever(){
+		var strUrl = location.search;
+		if (strUrl.indexOf("?") != -1) {
+			var aryPara = [];
+			var getSearch = strUrl.split("?");
+			getPara = getSearch[1].split("&");
+			for (i = 0; i < getPara.length; i++) {
+		    	var ParaVal = getPara[i].split("=");
+		    	aryPara.push(ParaVal[0]);
+		    	aryPara[ParaVal[0]] = ParaVal[1];
+		  }
+		  		console.log(aryPara );
+		  		// console.log(document.getElementById("msg").value);
+			var data ={name:document.getElementById("name").value
+						,msg:document.getElementById("msg").value
+						,gid:aryPara["gid"],tid:aryPara["tid"]};
+		}
+		// console.log(data);
+		var xhr=new XMLHttpRequest();
+		xhr.open("POST","add_msg.php");
+		xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
+		xhr.onreadystatechange = function(){//現在也可以用xhr.onload
+			if(this.readyState==4 ){
+				if(this.status == 201){
+					console.log(this.responseText);
+					insert2list(JSON.parse(this.responseText));
+				}else{
+					console.log(this.responseText);
+					alert('新增失敗');
+				}
+			}
+		};
+		console.log(JSON.stringify(data));
+		xhr.send(JSON.stringify(data));
+	}
+	</script>
+</head>
+<body>
+	<table border=0 id="list"></table>
+	<div id="edit_form">
+		暱稱：<input type="text" id="name">
+		留言：<input type="text" id="msg">
+		<button id="add_btn">新增</button>
+		<button id="update_btn">儲存編輯</button>
+		<button id="cancel_btn">取消</button>
+	</div>
+	<script type="text/javascript">
+		(function(){
+			document.getElementById("add_btn").addEventListener("click",add2sever);
+			getlist();
+		})();
+	</script>
+</body>
+</html>
