@@ -14,7 +14,7 @@
 		}
 		function edit_click(ev){
 			var id=ev.target.getAttribute("t_id");
-			// console.log(id);
+			console.log(id);
 			var xhr=new XMLHttpRequest();
 			xhr.open("GET","edit_group.php?id="+id);
 			xhr.onreadystatechange = function(){//現在也可以用xhr.onload
@@ -36,6 +36,7 @@
 			xhr.send();
 		}
 		function replaceList(data){
+			// console.log(data);
 			var tr = document.querySelector('tr[t_id="'+data.id+'"]');
 			var row =document.createElement('tr');
 			row.setAttribute('t_id',data.id);
@@ -61,15 +62,15 @@
 
 		function update2sever(){
 			var data;
-			data={name:document.getElementById("group").value,id:document.getElementById("t_id")};
-			console.log(data);
+			data={name:document.getElementById("group").value,id:document.getElementById("gid").value};
+			// console.log(data);
 			var xhr=new XMLHttpRequest();
 			xhr.open("POST","update_group_list.php");
 			xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
 			xhr.onreadystatechange = function(){//現在也可以用xhr.onload
 				if(this.readyState==4 ){
 					if(this.status == 200){
-						// console.log(this.responseText);
+						console.log(this.responseText);
 						replaceList(JSON.parse(this.responseText));
 						hideNode("edit_form");
 						showNode("show_add_btn");
@@ -138,7 +139,8 @@
 			a0=document.createElement('input');
 			a0.setAttribute("type","hidden");
 			a0.setAttribute("id","gid");
-			a0.appendChild(document.createTextNode(data.gid));
+			// console.log(data);
+			a0.setAttribute("value",data.gid);
 			a1=document.createElement('a');
 			a1.appendChild(document.createTextNode(data.gname));
 			a1.href="topic.html?gid="+data.gid;
