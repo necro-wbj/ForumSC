@@ -64,8 +64,9 @@
 		xhr.onreadystatechange = function(){//現在也可以用xhr.onload
 			if(this.readyState==4 ){
 				if(this.status == 200){
-					// console.log(this.responseText);
+					console.log(this.responseText);
 					var ret= JSON.parse(this.responseText);
+					// console.log(ret);
 					var tr = document.querySelector('tr[t_id="'+ret.id+'"]');
 					tr.parentNode.removeChild(tr);
 					}else{
@@ -74,6 +75,7 @@
 				}
 			}
 		};
+		// console.log(data);
 		xhr.send(JSON.stringify(data));
 	}
 	function insert2list(data,position=true){
@@ -89,10 +91,11 @@
 		ce2=row.insertCell(1);
 		var a0,a1,a2,a3
 		a0=document.createElement('input');
-		a0 = document.setAttribute("type","hidden");
+		a0.setAttribute("type","hidden");
 		a1=document.createElement('a');
 		a1.appendChild(document.createTextNode(data.tname));
 		a1.href="message.html?gid="+data.gid+"&tid="+data.tid;
+		ce1.appendChild(a0);
 		ce1.appendChild(a1);
 		var btn1,btn2
 		btn1=document.createElement('button');
@@ -153,6 +156,7 @@
 		  }
 			var data ={gid:aryPara["gid"],tname:document.getElementById("group").value};
 		}
+		// console.log(data);
 		var xhr=new XMLHttpRequest();
 		xhr.open("POST","add_topic.php");
 		xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
@@ -174,11 +178,12 @@
 	</script>
 </head>
 <body>
+	<button id="home"><a href="http://localhost/">回首頁</a></button>
 	<table border=1 id="list"></table>
 	<button id="show_add_btn">加入話題</button>
 	<div id="edit_form">
 		話題名稱：<input type="text" id="group">
-		<button id="add_btn">新增</button>
+		<button id="add_btn">新增
 		<button id="cancel_btn">取消</button>
 	</div>
 	<script type="text/javascript">

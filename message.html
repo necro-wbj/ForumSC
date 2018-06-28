@@ -31,12 +31,12 @@
 	function del_click(ev){
 		var data={id:ev.target.getAttribute("t_id")};
 		var xhr=new XMLHttpRequest();
-		xhr.open("DELETE","del.php");
+		xhr.open("DELETE","del_msg.php");
 		xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
 		xhr.onreadystatechange = function(){//現在也可以用xhr.onload
 			if(this.readyState==4 ){
 				if(this.status == 200){
-					// console.log(this.responseText);
+					console.log(this.responseText);
 					var ret= JSON.parse(this.responseText);
 					var tr = document.querySelector('tr[t_id="'+ret.id+'"]');
 					tr.parentNode.removeChild(tr);
@@ -46,16 +46,18 @@
 				}
 			}
 		};
+		// console.log(data);
 		xhr.send(JSON.stringify(data));
 	}
 	function insert2list(data,position=true){
+		console.log(data);
 		var tb1 =document.getElementById('list');
 		if (position){
 			var row =tb1.insertRow(tb1.rows.length);
 		}else{
 			var row =tb1.insertRow(0);
 		}
-		row.setAttribute('t_id',data.gid);
+		row.setAttribute('t_id',data.mid);
 		var ce1,ce2,ce3
 		ce1=row.insertCell(0);
 		ce2=row.insertCell(1);
@@ -64,11 +66,11 @@
 		ce2.appendChild(document.createTextNode(data.msg));
 		var btn1,btn2
 		btn1=document.createElement('button');
-		btn1.setAttribute('t_id',data.gid);
+		btn1.setAttribute('t_id',data.mid);
 		btn1.appendChild(document.createTextNode('刪除'));
 		btn1.addEventListener('click',del_click);
 		btn2=document.createElement('button');
-		btn2.setAttribute('t_id',data.gid);
+		btn2.setAttribute('t_id',data.mid);
 		btn2.appendChild(document.createTextNode('修改'));
 		btn2.addEventListener('click',edit_click);
 		ce2.appendChild(btn1);
@@ -119,7 +121,7 @@
 		    	aryPara.push(ParaVal[0]);
 		    	aryPara[ParaVal[0]] = ParaVal[1];
 		  }
-		  		console.log(aryPara );
+		  		// console.log(aryPara );
 		  		// console.log(document.getElementById("msg").value);
 			var data ={name:document.getElementById("name").value
 						,msg:document.getElementById("msg").value
@@ -132,7 +134,7 @@
 		xhr.onreadystatechange = function(){//現在也可以用xhr.onload
 			if(this.readyState==4 ){
 				if(this.status == 201){
-					console.log(this.responseText);
+					// console.log(this.responseText);
 					insert2list(JSON.parse(this.responseText));
 				}else{
 					console.log(this.responseText);
@@ -140,12 +142,13 @@
 				}
 			}
 		};
-		console.log(JSON.stringify(data));
+		// console.log(JSON.stringify(data));
 		xhr.send(JSON.stringify(data));
 	}
 	</script>
 </head>
 <body>
+	<button id="home"><a href="http://localhost/">回首頁</a></button>
 	<table border=0 id="list"></table>
 	<div id="edit_form">
 		暱稱：<input type="text" id="name">

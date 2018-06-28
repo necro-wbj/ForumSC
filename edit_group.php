@@ -4,19 +4,7 @@ if (!is_numeric($id)) {
 	echo "failed";
 	exit;
 }
-//連接資料庫
-try {
-	$db = new PDO('mysql:host=localhost;dbname=test0329;charset=utf8'
-		, 'mememe', '123456', array(
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-		));
-} catch (PDOException $err) {
-	http_response_code(500);
-	echo "failed";
-	echo $err->getMessage(); //測試用
-	exit;
-}
+require 'connect_database.php';
 //查詢
 $stmt = $db->prepare('select * from group_list where group_id=?');
 $stmt->execute([$id]);

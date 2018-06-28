@@ -14,16 +14,15 @@
 		}
 		function edit_click(ev){
 			var id=ev.target.getAttribute("t_id");
+			// console.log(id);
 			var xhr=new XMLHttpRequest();
 			xhr.open("GET","edit_group.php?id="+id);
 			xhr.onreadystatechange = function(){//現在也可以用xhr.onload
 				if(this.readyState==4 ){
 					if(this.status == 200){
-						console.log(this.responseText);
 						var data= JSON.parse(this.responseText);
-						document.getElementById("prod").value=data.prod;
-						document.getElementById("price").value=data.price;
-						document.getElementById("ppid").value=data.id;
+						// console.log(data);
+						document.getElementById("group").value=data.name;
 						showNode("edit_form");
 						showNode("update_btn");
 						hideNode("add_btn");
@@ -35,6 +34,52 @@
 				}
 			};
 			xhr.send();
+		}
+		function replaceList(data){
+			var tr = document.querySelector('tr[t_id="'+data.id+'"]');
+			var row =document.createElement('tr');
+			row.setAttribute('t_id',data.id);
+			var ce1,ce2,ce3
+			ce1=row.insertCell(0);
+			ce2=row.insertCell(1);
+			ce3=row.insertCell(2);
+			ce1.appendChild(document.createTextNode(data.prod));
+			ce2.appendChild(document.createTextNode(data.price));
+			var btn1,btn2;
+			btn1=document.createElement('button');
+			btn1.setAttribute('t_id',data.id);
+			btn1.appendChild(document.createTextNode('刪除'));
+			btn1.addEventListener('click',del_click);
+			btn2=document.createElement('button');
+			btn2.setAttribute('t_id',data.id);
+			btn2.appendChild(document.createTextNode('修改'));
+			btn2.addEventListener('click',edit_click);
+			ce3.appendChild(btn1);
+			ce3.appendChild(btn2);
+			tr.parentNode.replaceChild(row,tr)
+		}
+
+		function update2sever(){
+			var data;
+			data={name:document.getElementById("group").value,id:document.getElementById("t_id")};
+			console.log(data);
+			var xhr=new XMLHttpRequest();
+			xhr.open("POST","update_group_list.php");
+			xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
+			xhr.onreadystatechange = function(){//現在也可以用xhr.onload
+				if(this.readyState==4 ){
+					if(this.status == 200){
+						// console.log(this.responseText);
+						replaceList(JSON.parse(this.responseText));
+						hideNode("edit_form");
+						showNode("show_add_btn");
+					}else{
+						console.log(this.responseText);
+						alert('資料修改失敗');
+					}
+				}
+			};
+			xhr.send(JSON.stringify(data));
 		}
 		function getlist(){
 			var xhr=new XMLHttpRequest();
@@ -89,22 +134,27 @@
 			var ce1,ce2
 			ce1=row.insertCell(0);
 			ce2=row.insertCell(1);
-			var a1,a2,a3
+			var a0,a1,a2,a3
+			a0=document.createElement('input');
+			a0.setAttribute("type","hidden");
+			a0.setAttribute("id","gid");
+			a0.appendChild(document.createTextNode(data.gid));
 			a1=document.createElement('a');
 			a1.appendChild(document.createTextNode(data.gname));
 			a1.href="topic.html?gid="+data.gid;
+			ce1.appendChild(a0);
 			ce1.appendChild(a1);
 			var btn1,btn2
 			btn1=document.createElement('button');
 			btn1.setAttribute('t_id',data.gid);
 			btn1.appendChild(document.createTextNode('刪除'));
 			btn1.addEventListener('click',del_click);
-			// btn2=document.createElement('button');
-			// btn2.setAttribute('t_id',data.gid);
-			// btn2.appendChild(document.createTextNode('修改'));
-			// btn2.addEventListener('click',edit_click);
+			btn2=document.createElement('button');
+			btn2.setAttribute('t_id',data.gid);
+			btn2.appendChild(document.createTextNode('修改'));
+			btn2.addEventListener('click',edit_click);
 			ce2.appendChild(btn1);
-			// ce2.appendChild(btn2);
+			ce2.appendChild(btn2);
 		}
 		function add2sever(){
 			var data;
@@ -136,17 +186,20 @@
 	<div id="edit_form">
 		群組名稱：<input type="text" id="group">
 		<button id="add_btn">新增</button>
+		<button id="update_btn">儲存編輯</button>
 		<button id="cancel_btn">取消</button>
 	</div>
 
 	<script type="text/javascript">
 		(function(){
 			hideNode("edit_form");
+			hideNode("update_btn");
 			document.getElementById("show_add_btn").addEventListener("click",function(){showNode("edit_form");});
 			document.getElementById("cancel_btn").addEventListener("click",function(){hideNode("edit_form");});
 			document.getElementById("show_add_btn").addEventListener("click",function(){hideNode("show_add_btn");});
 			document.getElementById("cancel_btn").addEventListener("click",function(){showNode("show_add_btn");});
 			document.getElementById("add_btn").addEventListener("click",add2sever);
+			document.getElementById("update_btn").addEventListener("click",update2sever);
 			getlist();
 		})();
 	</script>
